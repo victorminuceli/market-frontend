@@ -320,3 +320,17 @@
     border-top: 1px solid var(--borda);
   }
 }
+
+.finalizar-compra {
+  width: 100%;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+
+.acoes-resultado-compra {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}

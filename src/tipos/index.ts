@@ -38,3 +38,20 @@ export interface Carrinho {
   itens: ItemCarrinho[]
   total: number
 }
+
+export type StatusPedido = 'RECEBIDO' | 'FINALIZADO'
+
+export interface ItemPedido {
+  id: number
+  produto: Produto
+  quantidade: number
+  preco: number
+}
+
+export interface Pedido {
+  id: number
+  data: string
+  valorTotal: number
+  status: StatusPedido
+  itens: ItemPedido[]
+}

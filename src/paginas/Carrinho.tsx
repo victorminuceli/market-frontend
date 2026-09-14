@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { useSessao } from '../contextos/ContextoSessao'
@@ -7,10 +7,12 @@ import {
   buscarCarrinho,
   removerItemDoCarrinho,
 } from '../servicos/carrinhoApi'
+import { finalizarCompra } from '../servicos/pedidosApi'
 
 import type {
   Carrinho as DadosCarrinho,
   ItemCarrinho,
+  Pedido,
   Produto,
 } from '../tipos'
 
@@ -60,7 +62,15 @@ function Carrinho() {
   const [itemProcessando, definirItemProcessando] =
     useState<number | null>(null)
 
+  const [finalizando, definirFinalizando] = useState(false)
+
+  const [pedidoFinalizado, definirPedidoFinalizado] =
+    useState<Pedido | null>(null)
+
+  const operacaoEmAndamento = useRef(false)
+
   const usuarioId = usuario?.id
+  const processando = itemProcessando !== null || finalizando
 
   useEffect(() => {
     if (usuarioId === undefined) return
@@ -97,6 +107,8 @@ function Carrinho() {
   }, [usuarioId, tentativa])
 
   function tentarNovamente() {
+    if (operacaoEmAndamento.current) return
+
     definirErro('')
     definirMensagem('')
     definirCarrinho(null)
@@ -109,8 +121,9 @@ function Carrinho() {
     operacao: () => Promise<unknown>,
     mensagemSucesso: string,
   ) {
-    if (usuarioId === undefined || itemProcessando !== null) return
+    if (usuarioId === undefined || operacaoEmAndamento.current) return
 
+    operacaoEmAndamento.current = true
     definirItemProcessando(itemId)
     definirErro('')
     definirMensagem('')
@@ -131,6 +144,7 @@ function Carrinho() {
           : 'Não foi possível confirmar a operação.',
       )
     } finally {
+      operacaoEmAndamento.current = false
       definirItemProcessando(null)
     }
   }
@@ -142,7 +156,8 @@ function Carrinho() {
     if (
       usuarioId === undefined ||
       !Number.isInteger(novaQuantidade) ||
-      novaQuantidade < 1
+      novaQuantidade < 1 ||
+      novaQuantidade > 2147483647
     ) {
       return
     }
@@ -164,12 +179,45 @@ function Carrinho() {
     )
   }
 
+  async function concluirCompra() {
+    if (
+      usuarioId === undefined ||
+      operacaoEmAndamento.current ||
+      !carrinho ||
+      carrinho.itens.length === 0 ||
+      pedidoFinalizado
+    ) {
+      return
+    }
+
+    operacaoEmAndamento.current = true
+    definirFinalizando(true)
+    definirErro('')
+    definirMensagem('')
+
+    try {
+      const pedido = await finalizarCompra(usuarioId)
+
+      definirPedidoFinalizado(pedido)
+      definirCarrinho(null)
+    } catch (falha) {
+      definirCarrinho(null)
+
+      definirErro(
+        falha instanceof Error
+          ? falha.message
+          : 'Não foi possível confirmar a compra. Consulte seus pedidos antes de tentar novamente.',
+      )
+    } finally {
+      operacaoEmAndamento.current = false
+      definirFinalizando(false)
+    }
+  }
+
   const quantidadeTotal = carrinho?.itens.reduce(
     (total, item) => total + item.quantidade,
     0,
   ) ?? 0
-
-  const processando = itemProcessando !== null
 
   return (
     <div className="pagina-carrinho">
@@ -185,6 +233,10 @@ function Carrinho() {
         <nav className="navegacao" aria-label="Menu principal">
           <Link className="link-entrar" to="/produtos">
             Produtos
+          </Link>
+
+          <Link className="link-entrar" to="/pedidos">
+            Meus pedidos
           </Link>
 
           <Link className="link-entrar" to="/perfil">
@@ -215,22 +267,54 @@ function Carrinho() {
           </p>
         )}
 
-        {carregando ? (
+        {pedidoFinalizado ? (
+          <div className="estado-carrinho">
+            <div role="status">
+              <h2>Compra finalizada!</h2>
+
+              <p>
+                Seu pedido #{pedidoFinalizado.id} foi criado com sucesso.
+              </p>
+
+              <p>
+                Total:{' '}
+                <strong>
+                  {formatoMoeda.format(pedidoFinalizado.valorTotal)}
+                </strong>
+              </p>
+            </div>
+
+            <div className="acoes-resultado-compra">
+              <Link className="botao botao-principal" to="/pedidos">
+                Ver meus pedidos
+              </Link>
+
+              <Link className="botao botao-secundario" to="/produtos">
+                Continuar comprando
+              </Link>
+            </div>
+          </div>
+        ) : carregando ? (
           <div className="estado-carrinho" role="status">
             <p>Carregando seu carrinho…</p>
           </div>
         ) : erro ? (
           <div className="estado-carrinho">
             <p role="alert">{erro}</p>
-            <p>Recarregue o carrinho para conferir os dados atuais.</p>
 
-            <button
-              className="botao botao-principal botao-carrinho"
-              type="button"
-              onClick={tentarNovamente}
-            >
-              Recarregar carrinho
-            </button>
+            <div className="acoes-resultado-compra">
+              <Link className="botao botao-secundario" to="/pedidos">
+                Consultar meus pedidos
+              </Link>
+
+              <button
+                className="botao botao-principal botao-carrinho"
+                type="button"
+                onClick={tentarNovamente}
+              >
+                Recarregar carrinho
+              </button>
+            </div>
           </div>
         ) : carrinho && carrinho.itens.length === 0 ? (
           <div className="estado-carrinho">
@@ -343,6 +427,21 @@ function Carrinho() {
                 <span>Total</span>
                 <strong>{formatoMoeda.format(carrinho.total)}</strong>
               </div>
+
+              <button
+                className="botao botao-principal finalizar-compra"
+                type="button"
+                onClick={concluirCompra}
+                disabled={processando}
+              >
+                {finalizando ? 'Finalizando…' : 'Finalizar compra'}
+              </button>
+
+              {finalizando && (
+                <p className="aviso-processando" role="status">
+                  Estamos criando seu pedido…
+                </p>
+              )}
 
               <Link
                 className="botao botao-secundario continuar-comprando"

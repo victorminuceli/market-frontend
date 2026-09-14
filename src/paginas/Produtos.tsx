@@ -209,6 +209,13 @@ function Produtos() {
 
           <Link
             className="botao botao-secundario"
+            to="/pedidos"
+          >
+            Meus pedidos
+          </Link>
+
+          <Link
+            className="botao botao-secundario"
             to="/perfil"
           >
             Meu perfil

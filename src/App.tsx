@@ -8,6 +8,7 @@ import Cadastro from './paginas/Cadastro'
 import Produtos from './paginas/Produtos'
 import Perfil from './paginas/Perfil'
 import Carrinho from './paginas/Carrinho'
+import Pedidos from './paginas/Pedidos'
 
 import './App.css'
 
@@ -55,6 +56,13 @@ function App() {
         path="/carrinho"
         element={
           usuario ? <Carrinho /> : <Navigate to="/login" replace />
+        }
+      />
+
+      <Route
+        path="/pedidos"
+        element={
+          usuario ? <Pedidos /> : <Navigate to="/login" replace />
         }
       />
 

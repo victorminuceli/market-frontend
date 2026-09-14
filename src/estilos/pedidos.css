@@ -1,0 +1,182 @@
+.pagina-pedidos {
+  width: min(1160px, calc(100% - 64px));
+  min-height: 100vh;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  color: #442d1c;
+}
+
+.conteudo-pedidos {
+  flex: 1;
+  padding: 40px 0 64px;
+}
+
+.titulo-pedidos {
+  margin-bottom: 32px;
+}
+
+.titulo-pedidos h1 {
+  margin: 0 0 12px;
+  font-family: Georgia, serif;
+  font-size: 42px;
+  font-weight: 400;
+}
+
+.titulo-pedidos p {
+  color: #84592b;
+  line-height: 1.6;
+}
+
+.lista-pedidos {
+  display: grid;
+  gap: 20px;
+}
+
+.cartao-pedido {
+  padding: 24px;
+  border: 1px solid #ded3c2;
+  border-radius: 16px;
+  background: #fffdf9;
+}
+
+.cabecalho-pedido {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.cabecalho-pedido h2 {
+  margin: 0 0 10px;
+  font-size: 20px;
+}
+
+.data-pedido {
+  color: #84592b;
+  font-size: 13px;
+}
+
+.status-pedido {
+  display: inline-block;
+  padding: 8px 12px;
+  border: 1px solid #9d9167;
+  border-radius: 20px;
+  background: #efeee3;
+  font-size: 12px;
+}
+
+.total-pedido {
+  margin: 24px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.total-pedido strong {
+  color: #743014;
+  font-size: 24px;
+}
+
+.detalhes-pedido {
+  border-top: 1px solid #ded3c2;
+  padding-top: 18px;
+}
+
+.detalhes-pedido summary {
+  cursor: pointer;
+  color: #743014;
+  font-weight: 600;
+}
+
+.detalhes-pedido summary:focus-visible {
+  outline: 2px solid #84592b;
+  outline-offset: 5px;
+}
+
+.itens-pedido {
+  list-style: none;
+  padding: 0;
+  margin: 18px 0 0;
+}
+
+.item-pedido {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 16px 0;
+}
+
+.item-pedido + .item-pedido {
+  border-top: 1px solid #eee7db;
+}
+
+.item-pedido > div {
+  min-width: 0;
+}
+
+.item-pedido h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+
+.item-pedido p {
+  margin: 0;
+  color: #84592b;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.item-pedido > strong {
+  flex-shrink: 0;
+  color: #743014;
+}
+
+.estado-pedidos {
+  padding: 40px 24px;
+  text-align: center;
+  border: 1px dashed #9d9167;
+  border-radius: 16px;
+}
+
+.estado-pedidos h2 {
+  margin-top: 0;
+  font-family: Georgia, serif;
+  font-weight: 400;
+}
+
+.estado-pedidos p {
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+@media (max-width: 680px) {
+  .pagina-pedidos {
+    width: calc(100% - 32px);
+  }
+
+  .pagina-pedidos .cabecalho,
+  .pagina-pedidos .navegacao {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .titulo-pedidos h1 {
+    font-size: 34px;
+  }
+
+  .cartao-pedido {
+    padding: 20px;
+  }
+
+  .item-pedido {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+}
