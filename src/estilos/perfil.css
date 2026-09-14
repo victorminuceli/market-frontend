@@ -318,3 +318,35 @@
     width: 100%;
   }
 }
+
+/* Exclusão da conta */
+
+.exclusao-conta {
+  margin-top: 36px;
+  padding-top: 26px;
+  border-top: 1px solid var(--borda);
+}
+
+.exclusao-conta h3 {
+  margin: 0 0 12px;
+  color: var(--terracota);
+  font-size: 18px;
+}
+
+.exclusao-conta > p {
+  margin-bottom: 20px;
+  color: #75644f;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.botao-excluir {
+  border-color: var(--terracota);
+  background: transparent;
+  color: var(--terracota);
+}
+
+.botao-excluir:hover {
+  background: var(--terracota);
+  color: #fff;
+}

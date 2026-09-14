@@ -3,7 +3,11 @@ import type { FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 
 import { useSessao } from '../contextos/ContextoSessao'
-import { atualizarUsuario, buscarUsuario } from '../servicos/api'
+import {
+  atualizarUsuario,
+  buscarUsuario,
+  excluirUsuario,
+} from '../servicos/api'
 import type { Usuario } from '../tipos'
 
 import '../estilos/perfil.css'
@@ -18,6 +22,7 @@ function Perfil() {
 
   const [editando, definirEditando] = useState(false)
   const [salvando, definirSalvando] = useState(false)
+  const [excluindo, definirExcluindo] = useState(false)
 
   const [nome, definirNome] = useState('')
   const [email, definirEmail] = useState('')
@@ -25,9 +30,11 @@ function Perfil() {
   const [confirmacaoSenha, definirConfirmacaoSenha] = useState('')
 
   const [erroFormulario, definirErroFormulario] = useState('')
+  const [erroExclusao, definirErroExclusao] = useState('')
   const [mensagemSucesso, definirMensagemSucesso] = useState('')
 
   const identificador = usuario?.id
+  const processando = salvando || excluindo
 
   useEffect(() => {
     if (identificador === undefined) return
@@ -70,13 +77,14 @@ function Perfil() {
   }
 
   function iniciarEdicao() {
-    if (!perfil) return
+    if (!perfil || processando) return
 
     definirNome(perfil.nome)
     definirEmail(perfil.email)
     definirSenha('')
     definirConfirmacaoSenha('')
     definirErroFormulario('')
+    definirErroExclusao('')
     definirMensagemSucesso('')
     definirEditando(true)
   }
@@ -93,7 +101,7 @@ function Perfil() {
   ) {
     evento.preventDefault()
 
-    if (!perfil || salvando) return
+    if (!perfil || processando) return
 
     definirErroFormulario('')
     definirMensagemSucesso('')
@@ -156,6 +164,36 @@ function Perfil() {
     }
   }
 
+  async function confirmarExclusao() {
+    if (!perfil || processando) return
+
+    const confirmou = window.confirm(
+      'Deseja excluir sua conta?\n\n' +
+        'Seu carrinho e todo o histórico de pedidos serão apagados permanentemente.\n\n' +
+        'Essa ação não pode ser desfeita.',
+    )
+
+    if (!confirmou) return
+
+    definirErroExclusao('')
+    definirMensagemSucesso('')
+    definirExcluindo(true)
+
+    try {
+      await excluirUsuario(perfil.id)
+
+      encerrarSessao()
+    } catch (falha) {
+      definirErroExclusao(
+        falha instanceof Error
+          ? falha.message
+          : 'Não foi possível excluir a conta.',
+      )
+    } finally {
+      definirExcluindo(false)
+    }
+  }
+
   const inicialNome = perfil?.nome
     .trim()
     .slice(0, 1)
@@ -181,7 +219,7 @@ function Perfil() {
             className="botao botao-secundario botao-perfil"
             type="button"
             onClick={encerrarSessao}
-            disabled={salvando}
+            disabled={processando}
           >
             Sair
           </button>
@@ -388,6 +426,7 @@ function Perfil() {
                       className="botao botao-principal botao-perfil"
                       type="button"
                       onClick={iniciarEdicao}
+                      disabled={excluindo}
                     >
                       Editar perfil
                     </button>
@@ -396,8 +435,41 @@ function Perfil() {
                       className="botao botao-secundario botao-perfil"
                       type="button"
                       onClick={encerrarSessao}
+                      disabled={excluindo}
                     >
                       Sair da conta
+                    </button>
+                  </div>
+
+                  <div
+                    className="exclusao-conta"
+                    aria-busy={excluindo}
+                  >
+                    <h3>Excluir conta</h3>
+
+                    <p>
+                      Sua conta, seu carrinho e seus pedidos serão
+                      apagados permanentemente.
+                    </p>
+
+                    {erroExclusao && (
+                      <p
+                        className="mensagem-perfil mensagem-perfil-erro"
+                        role="alert"
+                      >
+                        {erroExclusao}
+                      </p>
+                    )}
+
+                    <button
+                      className="botao botao-excluir botao-perfil"
+                      type="button"
+                      onClick={confirmarExclusao}
+                      disabled={excluindo}
+                    >
+                      {excluindo
+                        ? 'Excluindo…'
+                        : 'Excluir minha conta'}
                     </button>
                   </div>
                 </>

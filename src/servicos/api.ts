@@ -139,3 +139,28 @@ export function atualizarUsuario(
     'PUT',
   )
 }
+
+export async function excluirUsuario(
+  identificador: number,
+): Promise<void> {
+  let resposta: Response
+
+  try {
+    resposta = await fetch(`${enderecoApi}/usuarios/${identificador}`, {
+      method: 'DELETE',
+
+      signal: AbortSignal.timeout(15000),
+    })
+  } catch {
+    throw new Error(
+      'Não foi possível confirmar a exclusão. Verifique a conexão e tente carregar seu perfil novamente.',
+    )
+  }
+
+  if (!resposta.ok) {
+    throw new Error(
+      'O servidor não confirmou a exclusão da conta. Tente novamente.',
+    )
+  }
+
+}
