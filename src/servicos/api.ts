@@ -1,4 +1,5 @@
 import type {
+  DadosAtualizacaoUsuario,
   DadosCadastro,
   DadosLogin,
   Produto,
@@ -9,14 +10,15 @@ const enderecoApi = '/api'
 
 async function enviarDados(
   caminho: string,
-  dados: DadosLogin | DadosCadastro,
+  dados: DadosLogin | DadosCadastro | DadosAtualizacaoUsuario,
   mensagemErro: string,
+  metodo: 'POST' | 'PUT' = 'POST',
 ): Promise<Usuario> {
   let resposta: Response
 
   try {
     resposta = await fetch(`${enderecoApi}${caminho}`, {
-      method: 'POST',
+      method: metodo,
 
       headers: {
         'Content-Type': 'application/json',
@@ -115,4 +117,25 @@ export async function buscarUsuario(
     nome: usuario.nome,
     email: usuario.email,
   }
+}
+
+export function atualizarUsuario(
+  identificador: number,
+  dados: DadosAtualizacaoUsuario,
+): Promise<Usuario> {
+  const dadosAtualizados: DadosAtualizacaoUsuario = {
+    nome: dados.nome.trim(),
+    email: dados.email.trim(),
+  }
+
+  if (dados.senha && dados.senha.trim().length > 0) {
+    dadosAtualizados.senha = dados.senha
+  }
+
+  return enviarDados(
+    `/usuarios/${identificador}`,
+    dadosAtualizados,
+    'Não foi possível atualizar o perfil. Confira os dados, se o e-mail já está em uso e se a nova senha tem pelo menos 6 caracteres. Se o problema continuar, verifique o backend.',
+    'PUT',
+  )
 }

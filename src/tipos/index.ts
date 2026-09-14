@@ -13,6 +13,12 @@ export interface DadosCadastro extends DadosLogin {
   nome: string
 }
 
+export interface DadosAtualizacaoUsuario {
+  nome: string
+  email: string
+  senha?: string
+}
+
 export interface Produto {
   id: number
   nome: string
