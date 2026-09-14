@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
-import { usarSessao } from '../contextos/ContextoSessao'
+import { useSessao } from '../contextos/ContextoSessao'
 import { realizarLogin } from '../servicos/api'
 
 import '../estilos/acesso.css'
@@ -13,7 +13,7 @@ function Login() {
   const [erro, definirErro] = useState('')
   const [carregando, definirCarregando] = useState(false)
 
-  const { iniciarSessao } = usarSessao()
+  const { iniciarSessao } = useSessao()
   const navegar = useNavigate()
 
   async function enviarFormulario(

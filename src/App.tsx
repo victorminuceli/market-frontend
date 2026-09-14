@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 
-import { usarSessao } from './contextos/ContextoSessao'
+import { useSessao } from './contextos/ContextoSessao'
 
 import Inicio from './paginas/Inicio'
 import Login from './paginas/Login'
@@ -11,7 +11,7 @@ import Perfil from './paginas/Perfil'
 import './App.css'
 
 function App() {
-  const { usuario } = usarSessao()
+  const { usuario } = useSessao()
 
   return (
     <Routes>

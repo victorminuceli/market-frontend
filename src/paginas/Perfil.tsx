@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
-import { usarSessao } from '../contextos/ContextoSessao'
+import { useSessao } from '../contextos/ContextoSessao'
 import { buscarUsuario } from '../servicos/api'
 import type { Usuario } from '../tipos'
 
 import '../estilos/perfil.css'
 
 function Perfil() {
-  const { usuario, encerrarSessao } = usarSessao()
+  const { usuario, encerrarSessao } = useSessao()
 
   const [perfil, definirPerfil] = useState<Usuario | null>(null)
   const [carregando, definirCarregando] = useState(true)

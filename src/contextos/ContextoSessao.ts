@@ -11,12 +11,12 @@ export const ContextoSessao = createContext<
   DadosSessao | undefined
 >(undefined)
 
-export function usarSessao(): DadosSessao {
+export function useSessao(): DadosSessao {
   const contexto = useContext(ContextoSessao)
 
   if (!contexto) {
     throw new Error(
-      'usarSessao deve ser utilizado dentro de ProvedorSessao.',
+      'useSessao deve ser utilizado dentro de ProvedorSessao.',
     )
   }
 

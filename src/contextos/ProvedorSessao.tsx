@@ -72,7 +72,8 @@ export function ProvedorSessao({
         JSON.stringify(usuarioPublico),
       )
     } catch {
-
+      // Se o armazenamento estiver bloqueado,
+      // a sessão continua somente em memória.
     }
   }
 
@@ -82,7 +83,7 @@ export function ProvedorSessao({
     try {
       sessionStorage.removeItem(chaveSessao)
     } catch {
-
+      // O usuário já foi removido do estado em memória.
     }
   }
 

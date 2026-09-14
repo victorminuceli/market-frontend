@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
-import { usarSessao } from '../contextos/ContextoSessao'
+import { useSessao } from '../contextos/ContextoSessao'
 import { listarProdutos } from '../servicos/api'
 import type { Produto } from '../tipos'
 
@@ -13,7 +13,7 @@ const formatoMoeda = new Intl.NumberFormat('pt-BR', {
 })
 
 function Produtos() {
-  const { usuario, encerrarSessao } = usarSessao()
+  const { usuario, encerrarSessao } = useSessao()
 
   const [produtos, definirProdutos] = useState<Produto[]>([])
   const [busca, definirBusca] = useState('')
