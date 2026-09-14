@@ -1,6 +1,7 @@
 import type {
   DadosCadastro,
   DadosLogin,
+  Produto,
   Usuario,
 } from '../tipos'
 
@@ -69,4 +70,28 @@ export function cadastrarUsuario(
     },
     'Não foi possível cadastrar. Confira os dados e se o e-mail já está cadastrado. Se o problema continuar, verifique o backend.',
   )
+}
+
+export async function listarProdutos(): Promise<Produto[]> {
+  let resposta: Response
+
+  try {
+    resposta = await fetch(`${enderecoApi}/produtos`, {
+      signal: AbortSignal.timeout(15000),
+    })
+  } catch {
+    throw new Error(
+      'Não foi possível conectar ao servidor. Verifique se o backend está rodando.',
+    )
+  }
+
+  if (!resposta.ok) {
+    throw new Error(
+      'Não foi possível carregar os produtos. Tente novamente.',
+    )
+  }
+
+  const produtos: Produto[] = await resposta.json()
+
+  return produtos
 }
