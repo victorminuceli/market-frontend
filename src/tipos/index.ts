@@ -26,3 +26,15 @@ export interface Produto {
   categoria: string
   imagemUrl?: string | null
 }
+
+export interface ItemCarrinho {
+  id: number
+  produto: Produto
+  quantidade: number
+}
+
+export interface Carrinho {
+  id: number
+  itens: ItemCarrinho[]
+  total: number
+}

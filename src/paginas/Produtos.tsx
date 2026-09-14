@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 
 import { useSessao } from '../contextos/ContextoSessao'
 import { listarProdutos } from '../servicos/api'
+import { adicionarProdutoAoCarrinho } from '../servicos/carrinhoApi'
 import type { Produto } from '../tipos'
 
 import '../estilos/produtos.css'
@@ -64,6 +65,12 @@ function Produtos() {
   const [erro, definirErro] = useState('')
   const [tentativa, definirTentativa] = useState(0)
 
+  const [produtoAdicionando, definirProdutoAdicionando] =
+    useState<number | null>(null)
+
+  const [mensagemCarrinho, definirMensagemCarrinho] = useState('')
+  const [erroCarrinho, definirErroCarrinho] = useState('')
+
   useEffect(() => {
     let ativo = true
 
@@ -106,6 +113,34 @@ function Produtos() {
     definirBusca('')
     definirCategoria('')
     definirOrdenacao('nome')
+  }
+
+  async function adicionarAoCarrinho(produto: Produto) {
+    if (!usuario || produtoAdicionando !== null) return
+
+    definirProdutoAdicionando(produto.id)
+    definirMensagemCarrinho('')
+    definirErroCarrinho('')
+
+    try {
+      await adicionarProdutoAoCarrinho(
+        usuario.id,
+        produto.id,
+        1,
+      )
+
+      definirMensagemCarrinho(
+        `Uma unidade de ${produto.nome} foi adicionada ao carrinho.`,
+      )
+    } catch (falha) {
+      definirErroCarrinho(
+        falha instanceof Error
+          ? falha.message
+          : 'Não foi possível adicionar o produto ao carrinho.',
+      )
+    } finally {
+      definirProdutoAdicionando(null)
+    }
   }
 
   const primeiroNome = usuario?.nome.trim().split(/\s+/)[0]
@@ -167,6 +202,13 @@ function Produtos() {
         <nav className="navegacao" aria-label="Menu principal">
           <Link
             className="botao botao-secundario"
+            to="/carrinho"
+          >
+            Meu carrinho
+          </Link>
+
+          <Link
+            className="botao botao-secundario"
             to="/perfil"
           >
             Meu perfil
@@ -176,6 +218,7 @@ function Produtos() {
             className="botao botao-secundario botao-sair"
             type="button"
             onClick={encerrarSessao}
+            disabled={produtoAdicionando !== null}
           >
             Sair
           </button>
@@ -267,6 +310,24 @@ function Produtos() {
             </div>
           </div>
 
+          {mensagemCarrinho && (
+            <p
+              className="mensagem-catalogo mensagem-catalogo-sucesso"
+              role="status"
+            >
+              {mensagemCarrinho}
+            </p>
+          )}
+
+          {erroCarrinho && (
+            <p
+              className="mensagem-catalogo mensagem-catalogo-erro"
+              role="alert"
+            >
+              {erroCarrinho}
+            </p>
+          )}
+
           {carregando ? (
             <div className="estado-catalogo" role="status">
               <p>Carregando produtos…</p>
@@ -329,6 +390,20 @@ function Produtos() {
                         <p className="preco-produto">
                           {formatoMoeda.format(produto.preco)}
                         </p>
+
+                        <button
+                          className="botao botao-principal botao-adicionar"
+                          type="button"
+                          onClick={() => {
+                            adicionarAoCarrinho(produto)
+                          }}
+                          disabled={produtoAdicionando !== null}
+                          aria-label={`Adicionar ${produto.nome} ao carrinho`}
+                        >
+                          {produtoAdicionando === produto.id
+                            ? 'Adicionando…'
+                            : 'Adicionar ao carrinho'}
+                        </button>
                       </div>
                     </article>
                   ))}

@@ -357,3 +357,62 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Adicionar ao carrinho */
+
+.cartao-produto {
+  display: flex;
+  flex-direction: column;
+}
+
+.cartao-produto .visual-produto {
+  flex-shrink: 0;
+}
+
+.informacoes-produto {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.informacoes-produto .preco-produto {
+  margin-top: auto;
+}
+
+.botao-adicionar {
+  width: 100%;
+  margin-top: 22px;
+  padding-inline: 12px;
+  cursor: pointer;
+}
+
+.botao-adicionar:disabled,
+.botao-sair:disabled {
+  opacity: 0.65;
+  cursor: wait;
+  transform: none;
+}
+
+.mensagem-catalogo {
+  margin: 24px 0;
+  padding: 14px 18px;
+
+  border: 1px solid;
+  border-radius: 8px;
+
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.mensagem-catalogo-sucesso {
+  border-color: var(--oliva);
+  background: #eeeee2;
+  color: var(--marrom);
+}
+
+.mensagem-catalogo-erro {
+  border-color: #d6b3a0;
+  background: #f6e8df;
+  color: var(--terracota);
+}

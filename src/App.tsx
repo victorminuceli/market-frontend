@@ -7,6 +7,7 @@ import Login from './paginas/Login'
 import Cadastro from './paginas/Cadastro'
 import Produtos from './paginas/Produtos'
 import Perfil from './paginas/Perfil'
+import Carrinho from './paginas/Carrinho'
 
 import './App.css'
 
@@ -47,6 +48,13 @@ function App() {
         path="/perfil"
         element={
           usuario ? <Perfil /> : <Navigate to="/login" replace />
+        }
+      />
+
+      <Route
+        path="/carrinho"
+        element={
+          usuario ? <Carrinho /> : <Navigate to="/login" replace />
         }
       />
 
