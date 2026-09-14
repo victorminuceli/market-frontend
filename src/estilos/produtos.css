@@ -301,3 +301,15 @@
     grid-template-columns: 1fr;
   }
 }
+
+.botao-sair {
+  cursor: pointer;
+}
+
+.banner-produtos > div {
+  min-width: 0;
+}
+
+.banner-produtos h1 {
+  overflow-wrap: anywhere;
+}

@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
+import { usarSessao } from '../contextos/ContextoSessao'
 import { realizarLogin } from '../servicos/api'
-import type { Usuario } from '../tipos'
+
 import '../estilos/acesso.css'
 
 function Login() {
@@ -11,25 +12,31 @@ function Login() {
   const [senha, definirSenha] = useState('')
   const [erro, definirErro] = useState('')
   const [carregando, definirCarregando] = useState(false)
-  const [usuario, definirUsuario] = useState<Usuario | null>(null)
 
-  async function enviarFormulario(evento: FormEvent<HTMLFormElement>) {
+  const { iniciarSessao } = usarSessao()
+  const navegar = useNavigate()
+
+  async function enviarFormulario(
+    evento: FormEvent<HTMLFormElement>,
+  ) {
     evento.preventDefault()
 
     if (carregando) return
 
     definirErro('')
-    definirUsuario(null)
     definirCarregando(true)
 
     try {
-      const usuarioEncontrado = await realizarLogin({
+      const usuario = await realizarLogin({
         email,
         senha,
       })
 
-      definirUsuario(usuarioEncontrado)
-      definirSenha('')
+      iniciarSessao(usuario)
+
+      navegar('/produtos', {
+        replace: true,
+      })
     } catch (falha) {
       definirErro(
         falha instanceof Error
@@ -113,7 +120,6 @@ function Login() {
                     onChange={(evento) => {
                       definirEmail(evento.target.value)
                       definirErro('')
-                      definirUsuario(null)
                     }}
                     required
                   />
@@ -132,7 +138,6 @@ function Login() {
                     onChange={(evento) => {
                       definirSenha(evento.target.value)
                       definirErro('')
-                      definirUsuario(null)
                     }}
                     required
                   />
@@ -147,15 +152,6 @@ function Login() {
                   </p>
                 )}
 
-                {usuario && (
-                  <p
-                    className="aviso-acesso aviso-sucesso"
-                    role="status"
-                  >
-                    Olá, {usuario.nome}! Login realizado com sucesso.
-                  </p>
-                )}
-
                 <button
                   className="botao botao-principal botao-acesso"
                   type="submit"
@@ -164,6 +160,13 @@ function Login() {
                 </button>
               </fieldset>
             </form>
+
+            <p>
+              Ainda não tem conta?{' '}
+              <Link className="link-entrar" to="/cadastro">
+                Criar conta
+              </Link>
+            </p>
           </section>
         </div>
       </main>

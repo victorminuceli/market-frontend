@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
+import { usarSessao } from '../contextos/ContextoSessao'
 import { cadastrarUsuario } from '../servicos/api'
-import type { Usuario } from '../tipos'
+
 import '../estilos/acesso.css'
 
 function Cadastro() {
@@ -13,8 +14,9 @@ function Cadastro() {
   const [confirmacaoSenha, definirConfirmacaoSenha] = useState('')
   const [erro, definirErro] = useState('')
   const [carregando, definirCarregando] = useState(false)
-  const [usuarioCadastrado, definirUsuarioCadastrado] =
-    useState<Usuario | null>(null)
+
+  const { iniciarSessao } = usarSessao()
+  const navegar = useNavigate()
 
   async function enviarFormulario(
     evento: FormEvent<HTMLFormElement>,
@@ -49,9 +51,11 @@ function Cadastro() {
         senha,
       })
 
-      definirUsuarioCadastrado(usuario)
-      definirSenha('')
-      definirConfirmacaoSenha('')
+      iniciarSessao(usuario)
+
+      navegar('/produtos', {
+        replace: true,
+      })
     } catch (falha) {
       definirErro(
         falha instanceof Error
@@ -104,147 +108,119 @@ function Cadastro() {
           >
             <span className="etiqueta">FAÇA PARTE DO MARKET</span>
 
-            <h1 id="titulo-cadastro">
-              {usuarioCadastrado ? 'Conta criada!' : 'Crie sua conta'}
-            </h1>
+            <h1 id="titulo-cadastro">Crie sua conta</h1>
 
-            {usuarioCadastrado ? (
-              <div>
-                <p
-                  className="aviso-acesso aviso-sucesso"
-                  role="status"
-                >
-                  {usuarioCadastrado.nome}, seu cadastro foi
-                  realizado com sucesso!
-                </p>
+            <p className="descricao-acesso">
+              Preencha seus dados para começar.
+            </p>
 
-                <p className="descricao-acesso">
-                  Agora você pode entrar usando o e-mail e a senha
-                  que acabou de cadastrar.
-                </p>
+            <form
+              onSubmit={enviarFormulario}
+              aria-busy={carregando}
+            >
+              <fieldset
+                className="campos-acesso"
+                disabled={carregando}
+              >
+                <legend className="somente-leitor">
+                  Dados de cadastro
+                </legend>
 
-                <Link
-                  className="botao botao-principal botao-acesso"
-                  to="/login"
-                >
-                  Ir para o login
-                </Link>
-              </div>
-            ) : (
-              <>
-                <p className="descricao-acesso">
-                  Preencha seus dados para começar.
-                </p>
+                <div className="campo-acesso">
+                  <label htmlFor="nome">Nome completo</label>
 
-                <form
-                  onSubmit={enviarFormulario}
-                  aria-busy={carregando}
-                >
-                  <fieldset
-                    className="campos-acesso"
-                    disabled={carregando}
+                  <input
+                    id="nome"
+                    name="nome"
+                    type="text"
+                    placeholder="Digite seu nome"
+                    autoComplete="name"
+                    value={nome}
+                    onChange={(evento) => {
+                      definirNome(evento.target.value)
+                      definirErro('')
+                    }}
+                    required
+                  />
+                </div>
+
+                <div className="campo-acesso">
+                  <label htmlFor="email">E-mail</label>
+
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="voce@exemplo.com"
+                    autoComplete="email"
+                    value={email}
+                    onChange={(evento) => {
+                      definirEmail(evento.target.value)
+                      definirErro('')
+                    }}
+                    required
+                  />
+                </div>
+
+                <div className="campo-acesso">
+                  <label htmlFor="senha">
+                    Senha — mínimo de 6 caracteres
+                  </label>
+
+                  <input
+                    id="senha"
+                    name="senha"
+                    type="password"
+                    placeholder="Crie sua senha"
+                    autoComplete="new-password"
+                    minLength={6}
+                    value={senha}
+                    onChange={(evento) => {
+                      definirSenha(evento.target.value)
+                      definirErro('')
+                    }}
+                    required
+                  />
+                </div>
+
+                <div className="campo-acesso">
+                  <label htmlFor="confirmacaoSenha">
+                    Confirme a senha
+                  </label>
+
+                  <input
+                    id="confirmacaoSenha"
+                    name="confirmacaoSenha"
+                    type="password"
+                    placeholder="Digite a senha novamente"
+                    autoComplete="new-password"
+                    minLength={6}
+                    value={confirmacaoSenha}
+                    onChange={(evento) => {
+                      definirConfirmacaoSenha(evento.target.value)
+                      definirErro('')
+                    }}
+                    required
+                  />
+                </div>
+
+                {erro && (
+                  <p
+                    className="aviso-acesso aviso-erro"
+                    role="alert"
                   >
-                    <legend className="somente-leitor">
-                      Dados de cadastro
-                    </legend>
+                    {erro}
+                  </p>
+                )}
 
-                    <div className="campo-acesso">
-                      <label htmlFor="nome">Nome completo</label>
-
-                      <input
-                        id="nome"
-                        name="nome"
-                        type="text"
-                        placeholder="Digite seu nome"
-                        autoComplete="name"
-                        value={nome}
-                        onChange={(evento) => {
-                          definirNome(evento.target.value)
-                          definirErro('')
-                        }}
-                        required
-                      />
-                    </div>
-
-                    <div className="campo-acesso">
-                      <label htmlFor="email">E-mail</label>
-
-                      <input
-                        id="email"
-                        name="email"
-                        type="email"
-                        placeholder="voce@exemplo.com"
-                        autoComplete="email"
-                        value={email}
-                        onChange={(evento) => {
-                          definirEmail(evento.target.value)
-                          definirErro('')
-                        }}
-                        required
-                      />
-                    </div>
-
-                    <div className="campo-acesso">
-                      <label htmlFor="senha">
-                        Senha — mínimo de 6 caracteres
-                      </label>
-
-                      <input
-                        id="senha"
-                        name="senha"
-                        type="password"
-                        placeholder="Crie sua senha"
-                        autoComplete="new-password"
-                        minLength={6}
-                        value={senha}
-                        onChange={(evento) => {
-                          definirSenha(evento.target.value)
-                          definirErro('')
-                        }}
-                        required
-                      />
-                    </div>
-
-                    <div className="campo-acesso">
-                      <label htmlFor="confirmacaoSenha">
-                        Confirme a senha
-                      </label>
-
-                      <input
-                        id="confirmacaoSenha"
-                        name="confirmacaoSenha"
-                        type="password"
-                        placeholder="Digite a senha novamente"
-                        autoComplete="new-password"
-                        minLength={6}
-                        value={confirmacaoSenha}
-                        onChange={(evento) => {
-                          definirConfirmacaoSenha(evento.target.value)
-                          definirErro('')
-                        }}
-                        required
-                      />
-                    </div>
-
-                    {erro && (
-                      <p
-                        className="aviso-acesso aviso-erro"
-                        role="alert"
-                      >
-                        {erro}
-                      </p>
-                    )}
-
-                    <button
-                      className="botao botao-principal botao-acesso"
-                      type="submit"
-                    >
-                      {carregando ? 'Cadastrando…' : 'Criar conta'}
-                    </button>
-                  </fieldset>
-                </form>
-              </>
-            )}
+                <button
+                  className="botao botao-principal botao-acesso"
+                  type="submit"
+                >
+                  {carregando ? 'Cadastrando…' : 'Criar conta'}
+                </button>
+              </fieldset>
+            </form>
           </section>
         </div>
       </main>

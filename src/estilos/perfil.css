@@ -1,0 +1,200 @@
+.pagina-perfil {
+  width: min(1160px, calc(100% - 64px));
+  min-height: 100vh;
+  margin: 0 auto;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.conteudo-perfil {
+  flex: 1;
+  padding: 40px 0 64px;
+}
+
+.voltar-perfil {
+  display: inline-block;
+  margin-bottom: 32px;
+
+  color: var(--caramelo);
+  font-size: 13px;
+}
+
+.voltar-perfil:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.titulo-perfil {
+  margin-bottom: 32px;
+}
+
+.titulo-perfil .etiqueta {
+  margin-bottom: 14px;
+}
+
+.titulo-perfil h1 {
+  margin: 0 0 12px;
+
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 44px;
+  font-weight: 400;
+  letter-spacing: -1.5px;
+}
+
+.titulo-perfil p {
+  margin: 0;
+  color: #75644f;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.cartao-perfil {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+
+  overflow: hidden;
+  border: 1px solid var(--borda);
+  border-radius: 18px;
+
+  background: #fffdf8;
+  box-shadow: 0 18px 48px rgb(68 45 28 / 5%);
+}
+
+/* Nome e avatar */
+
+.resumo-perfil {
+  min-width: 0;
+  padding: 52px 30px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  background: #eae5d7;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.avatar-perfil {
+  width: 100px;
+  height: 100px;
+  margin-bottom: 24px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+  background: var(--oliva);
+  color: var(--marrom);
+
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 48px;
+}
+
+.resumo-perfil h2 {
+  max-width: 100%;
+  margin: 0 0 10px;
+
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 30px;
+  font-weight: 400;
+}
+
+.resumo-perfil p {
+  margin: 0;
+  color: #75644f;
+  font-size: 14px;
+}
+
+/* Informações */
+
+.dados-perfil {
+  min-width: 0;
+  padding: 44px;
+}
+
+.dados-perfil h2 {
+  margin: 0 0 12px;
+  font-size: 23px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+.descricao-perfil {
+  margin: 0;
+  color: #75644f;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.lista-dados-perfil {
+  margin: 30px 0;
+}
+
+.lista-dados-perfil > div {
+  padding: 18px 0;
+  border-bottom: 1px solid var(--borda);
+}
+
+.lista-dados-perfil dt {
+  color: #75644f;
+  font-size: 12px;
+}
+
+.lista-dados-perfil dd {
+  margin: 9px 0 0;
+  color: var(--marrom);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.botao-perfil {
+  cursor: pointer;
+}
+
+.estado-perfil {
+  padding: 48px 24px;
+  border: 1px dashed #b9aa94;
+  border-radius: 14px;
+  text-align: center;
+}
+
+.estado-perfil p {
+  color: #75644f;
+  line-height: 1.7;
+}
+
+/* Celulares */
+
+@media (max-width: 680px) {
+  .pagina-perfil {
+    width: calc(100% - 32px);
+  }
+
+  .conteudo-perfil {
+    padding: 28px 0 40px;
+  }
+
+  .titulo-perfil h1 {
+    font-size: 38px;
+  }
+
+  .cartao-perfil {
+    grid-template-columns: 1fr;
+  }
+
+  .resumo-perfil {
+    padding: 34px 24px;
+  }
+
+  .dados-perfil {
+    padding: 30px 24px;
+  }
+
+  .dados-perfil h2 {
+    font-size: 21px;
+  }
+}

@@ -45,6 +45,29 @@ async function enviarDados(
   }
 }
 
+async function consultarDados<T>(
+  caminho: string,
+  mensagemErro: string,
+): Promise<T> {
+  let resposta: Response
+
+  try {
+    resposta = await fetch(`${enderecoApi}${caminho}`, {
+      signal: AbortSignal.timeout(15000),
+    })
+  } catch {
+    throw new Error(
+      'Não foi possível conectar ao servidor. Verifique se o backend está rodando.',
+    )
+  }
+
+  if (!resposta.ok) {
+    throw new Error(mensagemErro)
+  }
+
+  return resposta.json() as Promise<T>
+}
+
 export function realizarLogin(
   dados: DadosLogin,
 ): Promise<Usuario> {
@@ -72,26 +95,24 @@ export function cadastrarUsuario(
   )
 }
 
-export async function listarProdutos(): Promise<Produto[]> {
-  let resposta: Response
+export function listarProdutos(): Promise<Produto[]> {
+  return consultarDados<Produto[]>(
+    '/produtos',
+    'Não foi possível carregar os produtos. Tente novamente.',
+  )
+}
 
-  try {
-    resposta = await fetch(`${enderecoApi}/produtos`, {
-      signal: AbortSignal.timeout(15000),
-    })
-  } catch {
-    throw new Error(
-      'Não foi possível conectar ao servidor. Verifique se o backend está rodando.',
-    )
+export async function buscarUsuario(
+  identificador: number,
+): Promise<Usuario> {
+  const usuario = await consultarDados<Usuario>(
+    `/usuarios/${identificador}`,
+    'Não foi possível carregar seu perfil. Tente novamente.',
+  )
+
+  return {
+    id: usuario.id,
+    nome: usuario.nome,
+    email: usuario.email,
   }
-
-  if (!resposta.ok) {
-    throw new Error(
-      'Não foi possível carregar os produtos. Tente novamente.',
-    )
-  }
-
-  const produtos: Produto[] = await resposta.json()
-
-  return produtos
 }

@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
+import { usarSessao } from '../contextos/ContextoSessao'
 import { listarProdutos } from '../servicos/api'
 import type { Produto } from '../tipos'
+
 import '../estilos/produtos.css'
 
 const formatoMoeda = new Intl.NumberFormat('pt-BR', {
@@ -11,6 +13,8 @@ const formatoMoeda = new Intl.NumberFormat('pt-BR', {
 })
 
 function Produtos() {
+  const { usuario, encerrarSessao } = usarSessao()
+
   const [produtos, definirProdutos] = useState<Produto[]>([])
   const [busca, definirBusca] = useState('')
   const [categoria, definirCategoria] = useState('')
@@ -61,9 +65,13 @@ function Produtos() {
     definirCategoria('')
   }
 
+  const primeiroNome = usuario?.nome.trim().split(/\s+/)[0]
+
   const categorias = [
     ...new Set(produtos.map((produto) => produto.categoria)),
-  ].sort((primeira, segunda) => primeira.localeCompare(segunda, 'pt-BR'))
+  ].sort((primeira, segunda) => {
+    return primeira.localeCompare(segunda, 'pt-BR')
+  })
 
   const produtosFiltrados = produtos.filter((produto) => {
     const correspondeBusca = produto.nome
@@ -79,27 +87,42 @@ function Produtos() {
   return (
     <div className="pagina-produtos">
       <header className="cabecalho">
-        <Link className="marca" to="/" aria-label="Market — início">
+        <Link
+          className="marca"
+          to="/produtos"
+          aria-label="Market — produtos"
+        >
           market<span>.</span>
         </Link>
 
         <nav className="navegacao" aria-label="Menu principal">
-          <Link className="link-entrar" to="/">
-            Início
+          <Link
+            className="botao botao-secundario"
+            to="/perfil"
+          >
+            Meu perfil
           </Link>
 
-          <Link className="link-entrar" to="/login">
-            Minha conta
-          </Link>
+          <button
+            className="botao botao-secundario botao-sair"
+            type="button"
+            onClick={encerrarSessao}
+          >
+            Sair
+          </button>
         </nav>
       </header>
 
       <main className="conteudo-produtos">
         <section className="banner-produtos">
           <div>
-            <span className="etiqueta-banner">ESCOLHAS PARA O SEU DIA</span>
+            <span className="etiqueta-banner">
+              ESCOLHAS PARA O SEU DIA
+            </span>
 
-            <h1>Encontre o seu essencial.</h1>
+            <h1>
+              {primeiroNome ? `Olá, ${primeiroNome}!` : 'Boas-vindas!'}
+            </h1>
 
             <p>
               Explore nossos produtos e descubra suas próximas escolhas.
@@ -113,7 +136,10 @@ function Produtos() {
 
         <section aria-labelledby="titulo-catalogo">
           <div className="titulo-catalogo">
-            <span className="etiqueta">CONHEÇA NOSSOS PRODUTOS</span>
+            <span className="etiqueta">
+              CONHEÇA NOSSOS PRODUTOS
+            </span>
+
             <h2 id="titulo-catalogo">Nosso catálogo</h2>
           </div>
 
@@ -145,7 +171,10 @@ function Produtos() {
                 <option value="">Todas as categorias</option>
 
                 {categorias.map((nomeCategoria) => (
-                  <option key={nomeCategoria} value={nomeCategoria}>
+                  <option
+                    key={nomeCategoria}
+                    value={nomeCategoria}
+                  >
                     {nomeCategoria}
                   </option>
                 ))}
@@ -199,10 +228,18 @@ function Produtos() {
               ) : (
                 <div className="grade-produtos">
                   {produtosFiltrados.map((produto) => (
-                    <article className="cartao-produto" key={produto.id}>
-                      <div className="visual-produto" aria-hidden="true">
+                    <article
+                      className="cartao-produto"
+                      key={produto.id}
+                    >
+                      <div
+                        className="visual-produto"
+                        aria-hidden="true"
+                      >
                         <span className="inicial-produto">
-                          {produto.nome.slice(0, 1).toLocaleUpperCase('pt-BR')}
+                          {produto.nome
+                            .slice(0, 1)
+                            .toLocaleUpperCase('pt-BR')}
                         </span>
 
                         <span className="legenda-produto">
