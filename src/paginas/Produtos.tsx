@@ -12,12 +12,54 @@ const formatoMoeda = new Intl.NumberFormat('pt-BR', {
   currency: 'BRL',
 })
 
+interface PropriedadesImagemProduto {
+  produto: Produto
+}
+
+function ImagemProduto({ produto }: PropriedadesImagemProduto) {
+  const [enderecoComErro, definirEnderecoComErro] = useState('')
+
+  const enderecoImagem = produto.imagemUrl
+    ? `/api${produto.imagemUrl}`
+    : ''
+
+  if (enderecoImagem && enderecoImagem !== enderecoComErro) {
+    return (
+      <div className="visual-produto">
+        <img
+          className="foto-produto"
+          src={enderecoImagem}
+          alt={produto.nome}
+          loading="lazy"
+          decoding="async"
+          onError={() => {
+            definirEnderecoComErro(enderecoImagem)
+          }}
+        />
+      </div>
+    )
+  }
+
+  return (
+    <div className="visual-produto" aria-hidden="true">
+      <span className="inicial-produto">
+        {produto.nome.slice(0, 1).toLocaleUpperCase('pt-BR')}
+      </span>
+
+      <span className="legenda-produto">
+        MARKET / SELEÇÃO
+      </span>
+    </div>
+  )
+}
+
 function Produtos() {
   const { usuario, encerrarSessao } = useSessao()
 
   const [produtos, definirProdutos] = useState<Produto[]>([])
   const [busca, definirBusca] = useState('')
   const [categoria, definirCategoria] = useState('')
+  const [ordenacao, definirOrdenacao] = useState('nome')
   const [carregando, definirCarregando] = useState(true)
   const [erro, definirErro] = useState('')
   const [tentativa, definirTentativa] = useState(0)
@@ -63,6 +105,7 @@ function Produtos() {
   function limparFiltros() {
     definirBusca('')
     definirCategoria('')
+    definirOrdenacao('nome')
   }
 
   const primeiroNome = usuario?.nome.trim().split(/\s+/)[0]
@@ -83,6 +126,32 @@ function Produtos() {
 
     return correspondeBusca && correspondeCategoria
   })
+
+  const produtosOrdenados = [...produtosFiltrados].sort(
+    (primeiroProduto, segundoProduto) => {
+      const comparacaoNome = primeiroProduto.nome.localeCompare(
+        segundoProduto.nome,
+        'pt-BR',
+        { sensitivity: 'base' },
+      )
+
+      if (ordenacao === 'menor-preco') {
+        return (
+          primeiroProduto.preco - segundoProduto.preco ||
+          comparacaoNome
+        )
+      }
+
+      if (ordenacao === 'maior-preco') {
+        return (
+          segundoProduto.preco - primeiroProduto.preco ||
+          comparacaoNome
+        )
+      }
+
+      return comparacaoNome
+    },
+  )
 
   return (
     <div className="pagina-produtos">
@@ -180,6 +249,22 @@ function Produtos() {
                 ))}
               </select>
             </div>
+
+            <div className="campo-filtro">
+              <label htmlFor="ordenacao">Ordenar por</label>
+
+              <select
+                id="ordenacao"
+                value={ordenacao}
+                onChange={(evento) => {
+                  definirOrdenacao(evento.target.value)
+                }}
+              >
+                <option value="nome">Nome: A–Z</option>
+                <option value="menor-preco">Menor preço</option>
+                <option value="maior-preco">Maior preço</option>
+              </select>
+            </div>
           </div>
 
           {carregando ? (
@@ -206,13 +291,13 @@ function Produtos() {
           ) : (
             <>
               <p className="quantidade-produtos" role="status">
-                {produtosFiltrados.length}{' '}
-                {produtosFiltrados.length === 1
+                {produtosOrdenados.length}{' '}
+                {produtosOrdenados.length === 1
                   ? 'produto encontrado'
                   : 'produtos encontrados'}
               </p>
 
-              {produtosFiltrados.length === 0 ? (
+              {produtosOrdenados.length === 0 ? (
                 <div className="estado-catalogo">
                   <h3>Nenhum produto encontrado.</h3>
                   <p>Experimente outro nome ou categoria.</p>
@@ -227,25 +312,12 @@ function Produtos() {
                 </div>
               ) : (
                 <div className="grade-produtos">
-                  {produtosFiltrados.map((produto) => (
+                  {produtosOrdenados.map((produto) => (
                     <article
                       className="cartao-produto"
                       key={produto.id}
                     >
-                      <div
-                        className="visual-produto"
-                        aria-hidden="true"
-                      >
-                        <span className="inicial-produto">
-                          {produto.nome
-                            .slice(0, 1)
-                            .toLocaleUpperCase('pt-BR')}
-                        </span>
-
-                        <span className="legenda-produto">
-                          MARKET / SELEÇÃO
-                        </span>
-                      </div>
+                      <ImagemProduto produto={produto} />
 
                       <div className="informacoes-produto">
                         <span className="categoria-produto">

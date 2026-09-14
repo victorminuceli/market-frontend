@@ -24,4 +24,5 @@ export interface Produto {
   nome: string
   preco: number
   categoria: string
+  imagemUrl?: string | null
 }
